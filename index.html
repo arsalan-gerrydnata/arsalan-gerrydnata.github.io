@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="google-site-verification" content="bwibvPyLBuskzg676bzaSQkQCk-uXQQ0lFX_5gAhDRE" />
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2K7P5E07QZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-2K7P5E07QZ');
+  </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Godown Rent Calculator — Import Cargo Storage & Demurrage Charges</title>
+<meta name="description" content="Free calculator for godown rent, demurrage and handling charges on import shipments. Enter your arrival date and weight to get an instant, accurate breakdown for General, DG and Cold Storage cargo.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+
+</head>
+<body>
+  <div class="ad-slot"><div class="ad-box">Advertisement — 728×90 leaderboard slot</div></div>
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="brand" href="index.html"><span class="mark"></span>Godown Rent Calculator</a>
+      <div class="nav-links">
+        <a href="index.html" class="active">Calculator</a>
+        <a href="saps.html" class="cta-saps">SAPS</a>
+        <a href="pia.html" class="cta-pia">PIA</a>
+        <a href="manzies.html" class="cta-manzies">Manzies</a>
+        <a href="guide-godown-rent.html">Guides</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a class="cta" href="index.html">Calculate Now</a>
+      </div>
+    </div>
+  </nav>
+<header class="page-header">
+    <div class="header-inner">
+      <div class="client-tag">Gerry'sDnata</div>
+      <div class="eyebrow">Cargo Storage Calculator</div>
+      <h1>Godown Rent &amp; Demurrage Calculator</h1>
+      <p class="sub">Enter the arrival date and weight of your shipment — the storage rent, handling charges, demurrage and sales tax are worked out for you, tier by tier.</p>
+    </div>
+    <div class="header-credit">Powered by Arsalan Kundi Service (Pvt) Ltd</div>
+  </header>
+  <div class="hero-illustration">
+    <img src="assets/img/hero-general.jpg" alt="Air cargo pallets ready for loading at Karachi Airport" loading="lazy">
+  </div>
+
+<main style="max-width:1040px;margin:0 auto;padding:32px 24px 10px;display:grid;grid-template-columns:1fr;gap:24px;">
+    <style>
+      @media(min-width:880px){ main{grid-template-columns: 380px 1fr; align-items:start;} }
+      .weight-row{display:flex; gap:8px;}
+      .weight-row input{flex:1;}
+      .date-row{display:flex; gap:10px;}
+      .date-row > div{flex:1; min-width:0;}
+      .date-row input{width:100%;}
+      @media(max-width:360px){ .date-row{flex-direction:column;} }
+      .unit-badge{display:flex; align-items:center; justify-content:center; padding:0 14px; background:var(--ink-900); color:var(--amber); font-family:var(--font-mono); font-size:12.5px; font-weight:600; border-radius:7px; letter-spacing:.04em;}
+      .toggle-advanced{font-family:var(--font-mono); font-size:12px; color:var(--teal); background:none; border:none; cursor:pointer; padding:0; text-decoration:underline; text-underline-offset:3px;}
+      .cat-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+      @media (max-width:520px){ .cat-grid{grid-template-columns:1fr;} }
+      .cat-btn{border:1.5px solid var(--line); background:#fff; border-radius:7px; padding:10px 8px; text-align:left; cursor:pointer; font-family:var(--font-body); transition:.12s ease;}
+      .cat-btn .name{display:block; font-size:12.5px; font-weight:600; color:var(--ink-900);}
+      .cat-btn .rate{display:block; font-family:var(--font-mono); font-size:10.5px; color:var(--ink-500); margin-top:2px;}
+      .cat-btn.active{border-color:var(--amber-dark); background:#FFF7EA; box-shadow:0 0 0 1px var(--amber-dark);}
+      .timeline-card{padding:22px 24px 20px;}
+      .timeline-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px; flex-wrap:wrap; gap:6px;}
+      .timeline-head h3{font-family:var(--font-display); font-size:15px;}
+      .timeline-head .days-count{font-family:var(--font-mono); font-size:13px; color:var(--ink-500);}
+      .timeline-head .days-count b{color:var(--ink-900);}
+      .strip{display:flex; height:34px; border-radius:6px; overflow:hidden; border:1px solid var(--line);}
+      .strip .seg{flex:1; position:relative; min-width:4px; transition:.2s ease;}
+      .strip .seg.free{background:#DDEFE4;}
+      .strip .seg.tier1{background:#FDEBC8;}
+      .strip .seg.tier2{background:#FBD59A;}
+      .strip .seg.tier11{background:var(--red); opacity:.85;}
+      .legend{display:flex; flex-wrap:wrap; gap:14px; margin-top:10px; font-family:var(--font-mono); font-size:11px; color:var(--ink-500);}
+      .legend span{display:inline-flex; align-items:center; gap:5px;}
+      .legend i{width:9px; height:9px; border-radius:2px; display:inline-block;}
+      .legend .lfree i{background:#DDEFE4; border:1px solid #B7D9C1;}
+      .legend .lt1 i{background:#FDEBC8; border:1px solid #E9C787;}
+      .legend .lt2 i{background:#FBD59A; border:1px solid #E0AC5E;}
+      .legend .lt11 i{background:var(--red);}
+      .ledger-card{padding:0; overflow:hidden;}
+      .ledger-top-slim{background:var(--ink-900); color:#B9C3D6; padding:14px 24px; font-family:var(--font-mono); font-size:12.5px;}
+      .row.total-row{border-top:2px solid var(--ink-900); border-bottom:none; margin-top:6px; padding:16px 24px; background:var(--ink-900); margin-left:-24px; margin-right:-24px; padding-left:24px; padding-right:24px;}
+      .row.total-row .rlabel{color:var(--amber); font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase;}
+      .row.total-row .ramt{color:#fff; font-family:var(--font-display); font-size:clamp(24px,4.5vw,32px); font-weight:700;}
+      .ledger-rows{padding:6px 24px 20px;}
+      .row{display:flex; justify-content:space-between; align-items:center; padding:11px 0; border-bottom:1px solid var(--line); font-size:14px;}
+      .row:last-of-type{border-bottom:none;}
+      .row .rlabel{color:var(--ink-700);}
+      .row .rlabel small{display:block; font-family:var(--font-mono); font-size:10.5px; color:var(--ink-500); margin-top:2px;}
+      .row .ramt{font-family:var(--font-mono); font-weight:600; font-variant-numeric:tabular-nums;}
+      .row.subtotal{border-top:1.5px solid var(--ink-900); border-bottom:none; margin-top:4px; padding-top:14px; font-weight:600;}
+      .row.tax .ramt{color:var(--teal);}
+    </style>
+
+    <section class="card form-card">
+      <h2 style="font-family:var(--font-display); font-size:16px; letter-spacing:.02em; margin-bottom:4px;">Shipment details</h2>
+      <p style="font-size:12.5px; color:var(--ink-500); margin-bottom:20px;">Charges effective from 06 Jul 2026</p>
+
+      <div class="field date-row">
+        <div>
+          <label for="arrivalDate">Arrival date</label>
+          <input type="date" id="arrivalDate">
+        </div>
+        <div>
+          <label for="gateOutDate">Gate out date</label>
+          <input type="date" id="gateOutDate">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="weight">Weight</label>
+        <div class="weight-row">
+          <input type="number" id="weight" min="0" step="0.1" placeholder="e.g. 201" value="49">
+          <div class="unit-badge">KG</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Cargo type</label>
+        <div class="cat-grid" id="catGrid"></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="card timeline-card">
+        <div class="timeline-head">
+          <h3>Storage day tiers</h3>
+          <div class="days-count">Days in godown: <b id="daysCount">–</b></div>
+        </div>
+        <div class="strip" id="strip"></div>
+        <div class="legend">
+          <span class="lfree"><i></i>Free days</span>
+          <span class="lt1"><i></i>Standard rate</span>
+          <span class="lt2"><i></i>Higher rate</span>
+          <span class="lt11"><i></i>Highest rate</span>
+        </div>
+      </div>
+
+      <div class="card ledger-card" style="margin-top:20px;">
+        <div class="ledger-top-slim">
+          <div class="cat-name" id="catNameOut">General Cargo</div>
+        </div>
+        <div class="ledger-rows" id="ledgerRows"></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="content-wrap" style="max-width:1040px;">
+    <h2>Guides &amp; explainers</h2>
+    <p>Want to understand where these numbers come from? These guides break down each charge in plain language.</p>
+    <div class="guide-grid">
+      <a class="guide-card" href="guide-godown-rent.html">
+        <img class="guide-icon" src="assets/img/icon-warehouse.svg" alt="" loading="lazy">
+        <span class="tag">Guide</span>
+        <h4>Godown Rent Guide</h4>
+        <p>How godown / warehouse rent is charged on import shipments at Karachi Airport.</p>
+      </a>
+      <a class="guide-card" href="guide-demurrage-explained.html">
+        <img class="guide-icon" src="assets/img/icon-clock.svg" alt="" loading="lazy">
+        <span class="tag">Guide</span>
+        <h4>Demurrage Explained</h4>
+        <p>How demurrage is calculated day by day, and why it grows so fast.</p>
+      </a>
+      <a class="guide-card" href="guide-import-clearance.html">
+        <img class="guide-icon" src="assets/img/icon-customs.svg" alt="" loading="lazy">
+        <span class="tag">Guide</span>
+        <h4>Import Clearance Charges</h4>
+        <p>Every charge on your import file — DO fee, documentation, handling and more.</p>
+      </a>
+      <a class="guide-card" href="guide-cold-storage.html">
+        <img class="guide-icon" src="assets/img/icon-snowflake.svg" alt="" loading="lazy">
+        <span class="tag">Guide</span>
+        <h4>Cold Storage Cargo Guide</h4>
+        <p>Storage rules and charges for temperature-controlled shipments.</p>
+      </a>
+      <a class="guide-card" href="guide-dg-cargo.html">
+        <img class="guide-icon" src="assets/img/icon-hazard.svg" alt="" loading="lazy">
+        <span class="tag">Guide</span>
+        <h4>Dangerous Goods (DG) Cargo</h4>
+        <p>Why DG cargo storage costs more, and what to expect.</p>
+      </a>
+      <a class="guide-card" href="guide-reduce-demurrage.html">
+        <img class="guide-icon" src="assets/img/icon-checklist.svg" alt="" loading="lazy">
+        <span class="tag">Guide</span>
+        <h4>Reduce Your Demurrage Bill</h4>
+        <p>Practical steps importers use to keep storage days — and charges — low.</p>
+      </a>
+    </div>
+  </div>
+
+<script>
+const DO_FEE = 9828;
+const DOC_CHARGES = 1226;
+const TAX_RATE = 0.15;
+
+const CATEGORIES = {
+  general: { type:"legacy", label: "General Cargo", rateNote: "Free upto 3 days", offset: 3,
+    handling: { upto50: 4269, upto100: 5431, upto200: 7259, perKgAbove200: 62 },
+    upto50Days: [0,0,0,1230,1230,1839,1839,1839,1839,1839], upto50Flat11: 2137,
+    above50Days: [0,0,0,31,31,62,62,62,62,62], above50Flat11: 87 },
+  dg: { type:"legacy", label: "DG Cargo (Dangerous Goods)", rateNote: "Chargeable from day 1", offset: 0,
+    handling: { upto50: 4568, upto100: 5811, upto200: 5811, perKgAbove200: 65 },
+    upto50Days: [2507,2507,3102,3102,3102,3102,3102,3102,3102,3102], upto50Flat11: 3102,
+    above50Days: [63,63,124,124,124,124,124,124,124,124], above50Flat11: 124 },
+  cold28: { type:"legacy", label: "Cold Storage (2–8°C)", rateNote: "Chargeable from day 1", offset: 0,
+    handling: { upto50: 6273, upto100: 7982, upto200: 7982, perKgAbove200: 93 },
+    upto50Days: [2617,2617,3238,3238,3238,3604,3604,3604,3604,3604], upto50Flat11: 3604,
+    above50Days: [65,65,130,130,130,193,193,193,193,193], above50Flat11: 193 },
+  cold1525: { type:"legacy", label: "Cold Storage (15–25°C)", rateNote: "Chargeable from day 1", offset: 0,
+    handling: { upto50: 7321, upto100: 9312, upto200: 9312, perKgAbove200: 109 },
+    upto50Days: [2617,2617,3238,3238,3238,3604,3604,3604,3604,3604], upto50Flat11: 3604,
+    above50Days: [65,65,130,130,130,193,193,193,193,193], above50Flat11: 193 },
+  freezer: { type:"legacy", label: "Cold Storage — Freezer", rateNote: "Chargeable from day 1", offset: 0,
+    handling: { upto50: 11884, upto100: 14224, upto200: 14224, perKgAbove200: 194 },
+    upto50Days: [5419,5419,6761,6761,6761,8015,8015,8015,8015,8015], upto50Flat11: 8015,
+    above50Days: [136,136,271,271,271,381,381,381,381,381], above50Flat11: 381 },
+  detained: { type:"ranged", label: "Detained Cargo (by Customs)", rateNote: "Handling charges not published", offset: 0,
+    weightCutoff: 20,
+    flatTiers: [{maxDays:7,rate:882},{maxDays:15,rate:1047},{maxDays:Infinity,rate:1325}],
+    perKgTiers: [{maxDays:7,rate:63},{maxDays:15,rate:84},{maxDays:Infinity,rate:105}],
+    handling: null },
+  radioactive: { type:"ranged", label: "Radio Active Material (DG)", rateNote: "Handling charges not published", offset: 0,
+    weightCutoff: 50,
+    flatTiers: [{maxDays:2,rate:3381},{maxDays:Infinity,rate:3943}],
+    perKgTiers: [{maxDays:2,rate:79},{maxDays:Infinity,rate:135}],
+    handling: null }
+};
+
+let currentCat = "general";
+const catGrid = document.getElementById("catGrid");
+Object.entries(CATEGORIES).forEach(([key, cat]) => {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "cat-btn" + (key === currentCat ? " active" : "");
+  btn.dataset.key = key;
+  btn.innerHTML = `<span class="name">${cat.label}</span><span class="rate">${cat.rateNote}</span>`;
+  btn.addEventListener("click", () => {
+    currentCat = key;
+    document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    recalc();
+  });
+  catGrid.appendChild(btn);
+});
+
+function toDateOnly(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+function fmtDateInput(d){ return d.toISOString().slice(0,10); }
+
+const arrivalInput = document.getElementById("arrivalDate");
+const gateOutInput = document.getElementById("gateOutDate");
+const weightInput = document.getElementById("weight");
+
+const today = toDateOnly(new Date());
+arrivalInput.value = fmtDateInput(today);
+gateOutInput.value = fmtDateInput(today);
+
+arrivalInput.addEventListener("change", recalc);
+gateOutInput.addEventListener("change", recalc);
+weightInput.addEventListener("input", recalc);
+
+function round(x){ return Math.round(x); }
+
+function calc(catKey, weight, days){
+  const cat = CATEGORIES[catKey];
+  weight = Math.max(0, weight || 0);
+  days = Math.max(1, days || 1);
+
+  let handling = 0, handlingTBC = false;
+  if (cat.type === "legacy" || cat.handling) {
+    if (weight <= 50) handling = cat.handling.upto50;
+    else if (weight <= 100) handling = cat.handling.upto100;
+    else if (weight <= 200) handling = cat.handling.upto200;
+    else handling = cat.handling.perKgAbove200 * weight;
+    handling = round(handling);
+  } else {
+    handlingTBC = true;
+  }
+
+  let demurrage = 0;
+  if (cat.type === "legacy") {
+    let term1 = 0, term2 = 0;
+    if (weight <= 50) {
+      if (days < 11) { term1 = cat.upto50Days[days - 1] * (days - cat.offset); }
+      else { term1 = cat.upto50Flat11 * (days - cat.offset); }
+    }
+    if (weight > 50) {
+      let rate = days < 11 ? cat.above50Days[days - 1] : cat.above50Flat11;
+      term2 = rate * (days - cat.offset) * weight;
+    }
+    demurrage = round(term1 + term2);
+  } else {
+    const tiers = weight <= cat.weightCutoff ? cat.flatTiers : cat.perKgTiers;
+    const tier = tiers.find(t => days <= t.maxDays);
+    demurrage = weight <= cat.weightCutoff ? tier.rate * days : tier.rate * days * weight;
+    demurrage = round(demurrage);
+  }
+
+  const subtotal = DO_FEE + DOC_CHARGES + handling + demurrage;
+  const tax = round(subtotal * TAX_RATE);
+  const total = subtotal + tax;
+  return { handling, demurrage, subtotal, tax, total, handlingTBC };
+}
+
+function fmtRs(n){ return "Rs. " + Math.round(n).toLocaleString("en-PK"); }
+
+function buildStrip(days, cat, weight){
+  const strip = document.getElementById("strip");
+  strip.innerHTML = "";
+  const shown = Math.min(days, 14);
+  for (let d = 1; d <= shown; d++){
+    const seg = document.createElement("div");
+    seg.className = "seg " + tierClass(d, cat, weight);
+    seg.title = "Day " + d;
+    strip.appendChild(seg);
+  }
+  if (days > 14){
+    const more = document.createElement("div");
+    more.className = "seg tier11";
+    more.style.flex = "0 0 26px";
+    more.style.display = "flex";
+    more.style.alignItems = "center";
+    more.style.justifyContent = "center";
+    more.style.color = "#fff";
+    more.style.fontFamily = "var(--font-mono)";
+    more.style.fontSize = "9px";
+    more.textContent = "+" + (days - 14);
+    strip.appendChild(more);
+  }
+}
+
+function tierClass(day, cat, weight){
+  if (cat.offset > 0 && day <= cat.offset) return "free";
+  if (cat.type === "legacy") {
+    if (day <= 5) return "tier1";
+    if (day <= 10) return "tier2";
+    return "tier11";
+  }
+  const tiers = weight <= cat.weightCutoff ? cat.flatTiers : cat.perKgTiers;
+  const idx = tiers.findIndex(t => day <= t.maxDays);
+  const palette = ["tier1", "tier2", "tier11"];
+  return palette[Math.min(idx, palette.length - 1)];
+}
+
+function recalc(){
+  const arrival = arrivalInput.value ? toDateOnly(new Date(arrivalInput.value + "T00:00:00")) : today;
+  const gateOut = gateOutInput.value ? toDateOnly(new Date(gateOutInput.value + "T00:00:00")) : today;
+
+  let days = Math.round((gateOut - arrival) / 86400000) + 1;
+  if (days < 1) days = 1;
+
+  const weight = parseFloat(weightInput.value) || 0;
+  const cat = CATEGORIES[currentCat];
+  const result = calc(currentCat, weight, days);
+
+  document.getElementById("daysCount").textContent = days + (days === 1 ? " day" : " days");
+  document.getElementById("catNameOut").textContent = cat.label;
+  buildStrip(days, cat, weight);
+
+  const freeNote = cat.offset > 0 ? `<small>First ${cat.offset} days free</small>` : "";
+  const handlingCell = result.handlingTBC
+    ? `<span style="display:inline-block;font-family:var(--font-mono);font-size:10px;padding:2px 6px;border-radius:4px;background:#FBEAEA;color:var(--red);letter-spacing:.03em;">Not published — confirm with warehouse</span>`
+    : fmtRs(result.handling);
+  document.getElementById("ledgerRows").innerHTML = `
+    <div class="row"><div class="rlabel">D/O Fee</div><div class="ramt">${fmtRs(DO_FEE)}</div></div>
+    <div class="row"><div class="rlabel">Documentation charges</div><div class="ramt">${fmtRs(DOC_CHARGES)}</div></div>
+    <div class="row"><div class="rlabel">Handling charges<small>Based on ${weight} kg</small></div><div class="ramt">${handlingCell}</div></div>
+    <div class="row"><div class="rlabel">Godown rent / demurrage${freeNote}</div><div class="ramt">${fmtRs(result.demurrage)}</div></div>
+    <div class="row subtotal"><div class="rlabel">Subtotal</div><div class="ramt">${fmtRs(result.subtotal)}</div></div>
+    <div class="row tax"><div class="rlabel">Sales tax @ 15%</div><div class="ramt">${fmtRs(result.tax)}</div></div>
+    <div class="row total-row"><div class="rlabel">Total payable</div><div class="ramt">${fmtRs(result.total)}</div></div>
+  `;
+}
+
+recalc();
+</script>
+  <div class="ad-slot"><div class="ad-box">Advertisement — 300×250 rectangle slot</div></div>
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="fcol">
+        <h5>Tool</h5>
+        <a href="index.html">Godown Rent Calculator</a>
+      </div>
+      <div class="fcol">
+        <h5>Guides</h5>
+        <a href="guide-godown-rent.html">Godown Rent Guide</a>
+        <a href="guide-demurrage-explained.html">Demurrage Explained</a>
+        <a href="guide-import-clearance.html">Import Clearance Charges</a>
+        <a href="guide-cold-storage.html">Cold Storage Cargo Guide</a>
+        <a href="guide-dg-cargo.html">Dangerous Goods (DG) Cargo</a>
+        <a href="guide-reduce-demurrage.html">Reduce Your Demurrage Bill</a>
+      </div>
+      <div class="fcol">
+        <h5>Site</h5>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="privacy-policy.html">Privacy Policy</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; 2026 Godown Rent Calculator. Independent reference tool for import cargo storage charge estimates. Not affiliated with any airport authority, customs department, or warehouse operator. Figures are estimates only — always confirm final charges with your warehouse operator or clearing agent.
+    </div>
+  </footer>
+</body>
+</html>
