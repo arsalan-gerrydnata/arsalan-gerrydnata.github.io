@@ -130,6 +130,10 @@
           <input type="checkbox" id="doToggle" style="width:16px; height:16px;">
           Include D.O Fee (Rs. 9,000)
         </label>
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; text-transform:none; letter-spacing:0; margin-bottom:10px;">
+          <input type="checkbox" id="consoleToggle" style="width:16px; height:16px;">
+          Include Console Charges (Rs. 7,000)
+        </label>
         <label style="display:flex; align-items:center; gap:8px; cursor:pointer; text-transform:none; letter-spacing:0;">
           <input type="checkbox" id="forkliftToggle" style="width:16px; height:16px;">
           Add Fork Lifter Charges (for heavy/bulk cargo, 100kg+)
@@ -207,9 +211,9 @@
 
 <script>
 const DO_FEE = { label: "D.O Fee", value: 9000 };
+const CONSOLE_CHARGE = { label: "Console Charges", value: 7000 };
 const ALWAYS_FIXED_CHARGES = [
-  { label: "Console Charges", value: 7000 },
-  { label: "PV Charges", value: 950 }
+  { label: "Documentation Charges (MAWB)", value: 950 }
 ];
 const TAX_RATE = 0.15;
 
@@ -245,17 +249,34 @@ const CATEGORIES = {
     perKgTiers: [{maxDays:2,rate:55},{maxDays:Infinity,rate:100}],
     handling: [{maxWeight:50,rate:4150},{maxWeight:200,rate:4850},{maxWeight:Infinity,perKg:76}]
   },
+  dgcoldcombined: {
+    label: "Special Cargo (DG / Cold Storage — Combined Rate)", rateNote: "No free days — flat rate from day 1", offset: 0, weightCutoff: 0,
+    flatTiers: [{maxDays:Infinity,rate:65}],
+    perKgTiers: [{maxDays:Infinity,rate:65}],
+    handling: [{maxWeight:50,rate:4200},{maxWeight:200,rate:5300},{maxWeight:Infinity,perKg:65}]
+  },
+  valuabledeclared: {
+    label: "Valuable and Valued Declared Cargo", rateNote: "No free days", offset: 0, weightCutoff: 50,
+    flatTiers: [{maxDays:3,rate:4300},{maxDays:Infinity,rate:5350}],
+    perKgTiers: [{maxDays:3,rate:105},{maxDays:Infinity,rate:200}],
+    handling: [{maxWeight:50,rate:5400},{maxWeight:200,rate:6400},{maxWeight:Infinity,perKg:85}]
+  },
+  detained: {
+    label: "Detained Cargo by Customs", rateNote: "No free days — no handling charge", offset: 0, weightCutoff: 50,
+    flatTiers: [{maxDays:5,rate:2180},{maxDays:10,rate:2620},{maxDays:Infinity,rate:3050}],
+    perKgTiers: [{maxDays:5,rate:60},{maxDays:10,rate:70},{maxDays:Infinity,rate:85}],
+    handling: null
+  },
+  oversize: {
+    label: "Over Size Consignment (1000kg+)", rateNote: "Flat one-time charge, no demurrage shown", offset: 0, weightCutoff: 0, flatCharge: true,
+    flatChargeTiers: [{maxWeight:4999,rate:34000},{maxWeight:19999,rate:64000},{maxWeight:Infinity,rate:92000}],
+    handling: null
+  },
   pharma: {
     label: "Pharma", rateNote: "Free upto 5 days", offset: 5, weightCutoff: 50,
     flatTiers: [{maxDays:7,rate:1600},{maxDays:10,rate:2000},{maxDays:Infinity,rate:2300}],
     perKgTiers: [{maxDays:7,rate:30},{maxDays:10,rate:65},{maxDays:Infinity,rate:80}],
     handling: [{maxWeight:50,rate:3300},{maxWeight:100,rate:4250},{maxWeight:200,rate:5700},{maxWeight:Infinity,perKg:45}]
-  },
-  valuable: {
-    label: "Special Cargo (Valuable / Perishable / Livestock)", rateNote: "No free days — flat rate from day 1", offset: 0, weightCutoff: 0,
-    flatTiers: [{maxDays:Infinity,rate:65}],
-    perKgTiers: [{maxDays:Infinity,rate:65}],
-    handling: [{maxWeight:50,rate:4200},{maxWeight:200,rate:5300},{maxWeight:Infinity,perKg:65}]
   }
 };
 
@@ -281,6 +302,8 @@ const forkliftToggle = document.getElementById("forkliftToggle");
 forkliftToggle.addEventListener("change", recalc);
 const doToggle = document.getElementById("doToggle");
 doToggle.addEventListener("change", recalc);
+const consoleToggle = document.getElementById("consoleToggle");
+consoleToggle.addEventListener("change", recalc);
 
 function toDateOnly(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
 function fmtDateInput(d){ return d.toISOString().slice(0,10); }
@@ -300,16 +323,31 @@ weightInput.addEventListener("input", recalc);
 function round(x){ return Math.round(x); }
 
 function calcHandling(handlingTiers, weight){
+  if (!handlingTiers) return { value: 0, tbc: false, na: true };
   const tier = handlingTiers.find(t => weight <= t.maxWeight);
-  return round(tier.perKg ? tier.perKg * weight : tier.rate);
+  return { value: round(tier.perKg ? tier.perKg * weight : tier.rate), tbc: false, na: false };
 }
 
-function calc(catKey, weight, days, forkliftOn, doOn){
+function calc(catKey, weight, days, forkliftOn, doOn, consoleOn){
   const cat = CATEGORIES[catKey];
   weight = Math.max(0, weight || 0);
   days = Math.max(1, days || 1);
 
-  const handling = calcHandling(cat.handling, weight);
+  if (cat.flatCharge) {
+    const tier = cat.flatChargeTiers.find(t => weight <= t.maxWeight) || cat.flatChargeTiers[cat.flatChargeTiers.length - 1];
+    const demurrage = tier.rate;
+    const handlingInfo = { value: 0, tbc: false, na: true };
+    let fixedTotal = ALWAYS_FIXED_CHARGES.reduce((sum, f) => sum + f.value, 0);
+    if (doOn) fixedTotal += DO_FEE.value;
+    if (consoleOn) fixedTotal += CONSOLE_CHARGE.value;
+    const subtotal = fixedTotal + demurrage;
+    const tax = round(subtotal * TAX_RATE);
+    const total = subtotal + tax;
+    return { handling: handlingInfo.value, handlingNA: true, demurrage, forklift: null, subtotal, tax, total };
+  }
+
+  const handlingInfo = calcHandling(cat.handling, weight);
+  const handling = handlingInfo.value;
 
   const activeDays = Math.max(days - cat.offset, 0);
   const tiers = weight <= cat.weightCutoff ? cat.flatTiers : cat.perKgTiers;
@@ -321,11 +359,12 @@ function calc(catKey, weight, days, forkliftOn, doOn){
 
   let fixedTotal = ALWAYS_FIXED_CHARGES.reduce((sum, f) => sum + f.value, 0);
   if (doOn) fixedTotal += DO_FEE.value;
+  if (consoleOn) fixedTotal += CONSOLE_CHARGE.value;
 
   const subtotal = fixedTotal + handling + demurrage + (forklift || 0);
   const tax = round(subtotal * TAX_RATE);
   const total = subtotal + tax;
-  return { handling, demurrage, forklift, subtotal, tax, total };
+  return { handling, handlingNA: handlingInfo.na, demurrage, forklift, subtotal, tax, total };
 }
 
 function fmtRs(n){ return "Rs. " + Math.round(n).toLocaleString("en-PK"); }
@@ -356,6 +395,7 @@ function buildStrip(days, cat){
 }
 
 function tierClass(day, cat){
+  if (cat.flatCharge) return "tier1";
   if (cat.offset > 0 && day <= cat.offset) return "free";
   const idx = cat.flatTiers.findIndex(t => day <= t.maxDays);
   const palette = ["tier1", "tier2", "tier11"];
@@ -377,7 +417,7 @@ function recalc(){
   document.getElementById("forkliftNote").textContent = forkliftApplicable
     ? ""
     : "Fork lifter charges apply to shipments of 100kg and above.";
-  const result = calc(currentCat, weight, days, forkliftToggle.checked, doToggle.checked);
+  const result = calc(currentCat, weight, days, forkliftToggle.checked, doToggle.checked, consoleToggle.checked);
 
   document.getElementById("daysCount").textContent = days + (days === 1 ? " day" : " days");
   document.getElementById("catNameOut").textContent = cat.label;
@@ -386,17 +426,24 @@ function recalc(){
   const freeNote = cat.offset > 0 ? `<small>First ${cat.offset} days free</small>` : "";
   const doRow = doToggle.checked
     ? `<div class="row"><div class="rlabel">${DO_FEE.label}</div><div class="ramt">${fmtRs(DO_FEE.value)}</div></div>` : "";
+  const consoleRow = consoleToggle.checked
+    ? `<div class="row"><div class="rlabel">${CONSOLE_CHARGE.label}</div><div class="ramt">${fmtRs(CONSOLE_CHARGE.value)}</div></div>` : "";
   const fixedRows = ALWAYS_FIXED_CHARGES.map(f =>
     `<div class="row"><div class="rlabel">${f.label}</div><div class="ramt">${fmtRs(f.value)}</div></div>`
   ).join("");
   const forkliftRow = result.forklift
     ? `<div class="row"><div class="rlabel">Fork lifter charges</div><div class="ramt">${fmtRs(result.forklift)}</div></div>`
     : "";
+  const handlingRow = result.handlingNA
+    ? `<div class="row"><div class="rlabel">Handling charges<small>Not charged for this category</small></div><div class="ramt">${fmtRs(0)}</div></div>`
+    : `<div class="row"><div class="rlabel">Handling charges<small>Based on ${weight} kg</small></div><div class="ramt">${fmtRs(result.handling)}</div></div>`;
+  const demurrageLabel = cat.flatCharge ? "Flat charge (weight-based)" : `Godown rent / demurrage${freeNote}`;
   document.getElementById("ledgerRows").innerHTML = `
     ${doRow}
+    ${consoleRow}
     ${fixedRows}
-    <div class="row"><div class="rlabel">Handling charges<small>Based on ${weight} kg</small></div><div class="ramt">${fmtRs(result.handling)}</div></div>
-    <div class="row"><div class="rlabel">Godown rent / demurrage${freeNote}</div><div class="ramt">${fmtRs(result.demurrage)}</div></div>
+    ${handlingRow}
+    <div class="row"><div class="rlabel">${demurrageLabel}</div><div class="ramt">${fmtRs(result.demurrage)}</div></div>
     ${forkliftRow}
     <div class="row subtotal"><div class="rlabel">Subtotal</div><div class="ramt">${fmtRs(result.subtotal)}</div></div>
     <div class="row tax"><div class="rlabel">Sales tax @ 15%</div><div class="ramt">${fmtRs(result.tax)}</div></div>
