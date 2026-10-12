@@ -18,7 +18,6 @@
 
 </head>
 <body>
-  <div class="ad-slot"><div class="ad-box">Advertisement — 728×90 leaderboard slot</div></div>
   <nav class="site-nav">
     <div class="nav-inner">
       <a class="brand" href="index.html"><span class="mark"></span>Godown Rent Calculator</a>
@@ -71,8 +70,26 @@
       <div class="t3">Enter your arrival date and weight — get an instant, accurate charge breakdown.</div>
     </a>
     <p>Rather than working through bracket tables and weight multipliers by hand, enter your arrival date and weight into the calculator above and the exact demurrage figure — matched to the published tariff — is generated instantly.</p>
+<p class="meta">Worked examples use the General Cargo tariff built into our calculator (D/O Rs. 9,828, documentation Rs. 1,226, 15% sales tax). Rates change when the operator revises its tariff, so treat every figure as an estimate and confirm before paying.</p>
+<h2>Demurrage step by step: the formula behind the number</h2>
+<p>Demurrage sounds mysterious, but for the tariffs on this site it follows a simple recipe. First find out how many days the cargo has been in the godown. Subtract the free days, if the category has any. That leaves the chargeable days. Then pick the daily rate that matches the bracket you are in and the weight of the shipment, and multiply.</p>
+<p>For cargo of 50 kg or less: <strong>rent = flat daily rate × chargeable days</strong>. For cargo above 50 kg: <strong>rent = rate per kg × chargeable days × weight</strong>. The key detail is that the rate you use is the rate for the <em>final</em> day, applied to <em>all</em> chargeable days. It is not a running total where early days keep their cheaper rate. This is why the bill jumps when you cross from one bracket into the next.</p>
+
+<h2>Example 1: a light shipment crossing into the top bracket</h2>
+<p>A 30 kg general cargo shipment, gate-out on day 10 versus day 11:</p><div class="table-wrap"><table class="data-table"><tr><th>Gate-out</th><th>Daily rate</th><th>Chargeable days</th><th>Rent</th></tr><tr><td>Day 10</td><td class="num">Rs. 1,839</td><td class="num">7</td><td class="num">Rs. 12,873</td></tr><tr><td>Day 11</td><td class="num">Rs. 2,137</td><td class="num">8</td><td class="num">Rs. 17,096</td></tr></table></div>
+<p>One extra day cost Rs. 4,223 in rent, before tax, because both the rate and the day count moved together. Staying one day less would have saved that jump.</p>
+
+<h2>Example 2: a large shipment of 500 kg</h2>
+<p>This is where demurrage hurts. A 500 kg consignment of general cargo is billed per kilogram, per day, and handling alone is 500 × Rs. 62 = Rs. 31,000.</p><div class="table-wrap"><table class="data-table"><tr><th>Gate-out</th><th>Rate / kg / day</th><th>Chargeable days</th><th>Rent</th><th>Total incl. tax</th></tr><tr><td>Day 4</td><td class="num">Rs. 31</td><td class="num">1</td><td class="num">Rs. 15,500</td><td class="num">Rs. 66,187</td></tr><tr><td>Day 10</td><td class="num">Rs. 62</td><td class="num">7</td><td class="num">Rs. 217,000</td><td class="num">Rs. 297,912</td></tr></table></div>
+<p>Six extra days turned a bill of about Rs. 66,000 into nearly Rs. 298,000. For heavy cargo, every single day in the godown has a real price, and the cost of delay is far higher than most importers expect.</p>
+
+<h2>Free days versus chargeable days</h2>
+<p>General cargo in our Gerry'sDnata tariff gets three free days. Dangerous goods and cold storage categories do not; they are chargeable from day one. This is why a 40 kg DG shipment cleared in only two days still pays Rs. 5,014 in rent, while the same weight of general cargo pays nothing.</p>
+
+<h2>Demurrage is not the same as detention</h2>
+<p>People often mix the terms up. In shipping, <em>demurrage</em> is the charge for cargo or containers occupying port or terminal space past the free time, while <em>detention</em> is the charge for keeping a carrier's container outside the terminal. In air cargo, the warehouse charge is usually called godown rent or storage, and most people simply call the whole bill "demurrage". On this site the two words refer to the same thing: the daily storage charge that grows with time and weight.</p>
+<h2>Frequently asked questions</h2><div class="faq"><h3>When does the demurrage clock start?</h3><p>It starts when the cargo is received into the warehouse after the flight lands. The free days, if any, are counted from that day.</p><h3>Does demurrage stop once customs releases the goods?</h3><p>Not automatically. Charges continue until the cargo physically leaves the godown. If customs clears your goods on Friday evening but you collect on Monday, the weekend days still count.</p><h3>Why does my rate jump at day 6 and day 11?</h3><p>Tariffs use brackets. Each bracket has a higher rate, and the rate for the bracket you finish in applies to all chargeable days.</p><h3>Can demurrage be waived?</h3><p>Occasionally operators grant relief where the delay was caused by the operator, a documented system outage or an official holiday. It is discretionary, so keep written proof and ask early.</p><h3>Is sales tax charged on demurrage too?</h3><p>In our calculator the 15% sales tax applies to the whole subtotal, which includes demurrage, handling, the D/O fee and documentation.</p></div>
   </div>
-  <div class="ad-slot"><div class="ad-box">Advertisement — 300×250 rectangle slot</div></div>
   <footer class="site-footer">
     <div class="footer-inner">
       <div class="fcol">
@@ -87,6 +104,9 @@
         <a href="guide-cold-storage.html">Cold Storage Cargo Guide</a>
         <a href="guide-dg-cargo.html">Dangerous Goods (DG) Cargo</a>
         <a href="guide-reduce-demurrage.html">Reduce Your Demurrage Bill</a>
+        <a href="guide-karachi-import-process.html">Import Clearance Process (Step by Step)</a>
+        <a href="guide-common-mistakes.html">Common Importer Mistakes</a>
+        <a href="faq.html">Frequently Asked Questions</a>
       </div>
       <div class="fcol">
         <h5>Site</h5>
