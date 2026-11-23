@@ -98,7 +98,7 @@
 
     <section class="card form-card">
       <h2 style="font-family:var(--font-display); font-size:16px; letter-spacing:.02em; margin-bottom:4px;">Shipment details</h2>
-      <p style="font-size:12.5px; color:var(--ink-500); margin-bottom:20px;">SAPS charges effective from 15 May 2026</p>
+      <p style="font-size:12.5px; color:var(--ink-500); margin-bottom:20px;">PIA charges effective from 15 March 2026</p>
 
       <div class="field date-row">
         <div>
@@ -248,12 +248,6 @@ const CATEGORIES = {
     perKgTiers: [{maxDays:2,rate:55},{maxDays:Infinity,rate:100}],
     handling: [{maxWeight:50,rate:4150},{maxWeight:200,rate:4850},{maxWeight:Infinity,perKg:76}]
   },
-  dgcoldcombined: {
-    label: "Special Cargo (DG / Cold Storage — Combined Rate)", rateNote: "No free days — flat rate from day 1", offset: 0, weightCutoff: 0,
-    flatTiers: [{maxDays:Infinity,rate:65}],
-    perKgTiers: [{maxDays:Infinity,rate:65}],
-    handling: [{maxWeight:50,rate:4200},{maxWeight:200,rate:5300},{maxWeight:Infinity,perKg:65}]
-  },
   valuabledeclared: {
     label: "Valuable and Valued Declared Cargo", rateNote: "No free days", offset: 0, weightCutoff: 50,
     flatTiers: [{maxDays:3,rate:4300},{maxDays:Infinity,rate:5350}],
@@ -272,10 +266,16 @@ const CATEGORIES = {
     handling: null
   },
   pharma: {
-    label: "Pharma", rateNote: "Free upto 5 days", offset: 5, weightCutoff: 50,
+    label: "Pharma — General Cargo", rateNote: "Free upto 5 days", offset: 5, weightCutoff: 50,
     flatTiers: [{maxDays:7,rate:1600},{maxDays:10,rate:2000},{maxDays:Infinity,rate:2300}],
     perKgTiers: [{maxDays:7,rate:30},{maxDays:10,rate:65},{maxDays:Infinity,rate:80}],
     handling: [{maxWeight:50,rate:3300},{maxWeight:100,rate:4250},{maxWeight:200,rate:5700},{maxWeight:Infinity,perKg:45}]
+  },
+  dgcoldcombined: {
+    label: "Pharma — Special Cargo (DG / Cold Storage)", rateNote: "No free days — Rs. 65 per kg per day", offset: 0, weightCutoff: 0,
+    flatTiers: [{maxDays:Infinity,rate:65}],
+    perKgTiers: [{maxDays:Infinity,rate:65}],
+    handling: [{maxWeight:50,rate:4200},{maxWeight:200,rate:5300},{maxWeight:Infinity,perKg:65}]
   }
 };
 
@@ -348,10 +348,14 @@ function calc(catKey, weight, days, forkliftOn, doOn, consoleOn){
   const handlingInfo = calcHandling(cat.handling, weight);
   const handling = handlingInfo.value;
 
-  const activeDays = Math.max(days - cat.offset, 0);
-  const tiers = weight <= cat.weightCutoff ? cat.flatTiers : cat.perKgTiers;
-  const tier = tiers.find(t => days <= t.maxDays);
-  let demurrage = weight <= cat.weightCutoff ? tier.rate * activeDays : tier.rate * activeDays * weight;
+  // Slab-by-slab: each chargeable day is billed at the rate of the slab that day falls in
+  const isFlat = weight <= cat.weightCutoff;
+  const tiers = isFlat ? cat.flatTiers : cat.perKgTiers;
+  let demurrage = 0;
+  for (let d = cat.offset + 1; d <= days; d++) {
+    const t = tiers.find(t => d <= t.maxDays);
+    demurrage += isFlat ? t.rate : t.rate * weight;
+  }
   demurrage = round(demurrage);
 
   const forklift = forkliftOn ? calcForklift(weight) : null;
